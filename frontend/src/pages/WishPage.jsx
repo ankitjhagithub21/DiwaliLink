@@ -229,7 +229,7 @@ export default function WishPage() {
         <motion.img 
           src="/images/design-5 1.png" 
           alt="Design"
-          className="absolute top-0 left-0 w-72 md:w-50"
+          className="absolute top-0 left-0 w-30 md:w-50"
           initial={{ opacity: 0, x: -100 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
