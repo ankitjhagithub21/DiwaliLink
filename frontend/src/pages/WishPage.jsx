@@ -12,7 +12,7 @@ export default function WishPage() {
   useEffect(() => {
     const fetchWishName = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/wish/${slug}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/wish/${slug}`);
         if (response.ok) {
           const data = await response.json();
           setDisplayName(data.name || slug.replace(/-/g, " "));
