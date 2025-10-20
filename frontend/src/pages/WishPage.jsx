@@ -9,6 +9,7 @@ export default function WishPage() {
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [linkNotFound, setLinkNotFound] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const audioRef = useRef(null);
 
@@ -19,6 +20,8 @@ export default function WishPage() {
         if (response.ok) {
           const data = await response.json();
           setDisplayName(data.name || slug.replace(/-/g, " "));
+        } else if (response.status === 404) {
+          setLinkNotFound(true);
         } else {
           setDisplayName(slug.replace(/-/g, " "));
         }
@@ -87,6 +90,108 @@ export default function WishPage() {
 
   if (loading) {
     return <DiwaliLoader />;
+  }
+
+  if (linkNotFound) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-100 via-yellow-50 to-red-100 flex items-center justify-center p-6">
+        <motion.div 
+          className="text-center max-w-2xl mx-auto"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <motion.div
+            className="text-9xl mb-6"
+            animate={{ rotate: [0, -10, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            😔
+          </motion.div>
+          
+          <motion.h1 
+            className="text-6xl font-bold text-orange-600 mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+          >
+            Oops!
+          </motion.h1>
+          
+          <motion.p 
+            className="text-2xl text-gray-700 mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+          >
+            This Diwali wish link doesn't exist or has been removed.
+          </motion.p>
+          
+          <motion.p 
+            className="text-lg text-gray-600 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.6 }}
+          >
+            But don't worry! You can create your own beautiful Diwali wish to share with your loved ones.
+          </motion.p>
+
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.6 }}
+          >
+            <motion.a
+              href="/"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-xl font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              🎆 Create Your Diwali Wish
+            </motion.a>
+            
+            <motion.button
+              onClick={() => window.history.back()}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 border-2 border-orange-500 text-orange-500 text-xl font-semibold rounded-full hover:bg-orange-50 transition-all duration-300"
+            >
+              ← Go Back
+            </motion.button>
+          </motion.div>
+
+          <motion.div 
+            className="mt-12 flex justify-center gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+          >
+            <motion.div
+              className="text-3xl"
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0 }}
+            >
+              🪔
+            </motion.div>
+            <motion.div
+              className="text-3xl"
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+            >
+              ✨
+            </motion.div>
+            <motion.div
+              className="text-3xl"
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
+            >
+              🎆
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </div>
+    );
   }
 
   if (error) {
