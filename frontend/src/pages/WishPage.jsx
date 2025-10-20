@@ -314,7 +314,7 @@ export default function WishPage() {
         />
 
         <motion.h2 
-          className="text-4xl md:text-6xl font-normal text-center mb-8 text-gray-800"
+          className="text-2xl md:text-6xl font-normal text-center mb-8 text-gray-800"
           style={{ fontFamily: 'Style Script, serif' }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
