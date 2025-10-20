@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Volume2, VolumeX } from "lucide-react";
 import DiwaliLoader from "../components/DiwaliLoader";
 
 export default function WishPage() {
@@ -8,6 +9,8 @@ export default function WishPage() {
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     const fetchWishName = async () => {
@@ -32,6 +35,56 @@ export default function WishPage() {
     }
   }, [slug]);
 
+  useEffect(() => {
+    // Initialize audio
+    audioRef.current = new Audio('/diwali-music.mp3');
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.3;
+
+    // Try to autoplay immediately
+    const startMusic = async () => {
+      try {
+        await audioRef.current.play();
+        setIsMusicPlaying(true);
+      } catch (error) {
+        // Autoplay blocked, set up click listener
+        const handleFirstClick = async () => {
+          try {
+            await audioRef.current.play();
+            setIsMusicPlaying(true);
+            document.removeEventListener('click', handleFirstClick);
+          } catch (err) {
+            console.log('Music play failed:', err);
+          }
+        };
+        document.addEventListener('click', handleFirstClick);
+      }
+    };
+
+    // Start music after a short delay
+    const timer = setTimeout(startMusic, 500);
+
+    return () => {
+      clearTimeout(timer);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const toggleMusic = () => {
+    if (audioRef.current) {
+      if (isMusicPlaying) {
+        audioRef.current.pause();
+        setIsMusicPlaying(false);
+      } else {
+        audioRef.current.play().catch(console.error);
+        setIsMusicPlaying(true);
+      }
+    }
+  };
+
   if (loading) {
     return <DiwaliLoader />;
   }
@@ -45,7 +98,24 @@ export default function WishPage() {
   }
 
   return (
-    <div className="min-h-screen bg-orange-400" style={{ fontFamily: 'Georgia, serif' }}>
+    <div className="min-h-screen bg-orange-400 w-full overflow-y-scroll overflow-x-hidden" style={{ fontFamily: 'Georgia, serif' }}>
+      {/* Music Toggle Button */}
+      <motion.button
+        onClick={toggleMusic}
+        className="fixed top-6 right-6 z-50 bg-white/90 backdrop-blur-sm hover:bg-white transition-all duration-300 rounded-full p-3 shadow-lg hover:shadow-xl"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 2, duration: 0.5 }}
+      >
+        {isMusicPlaying ? (
+          <Volume2 className="w-6 h-6 text-orange-600" />
+        ) : (
+          <VolumeX className="w-6 h-6 text-gray-600" />
+        )}
+      </motion.button>
+
       {/* Hero Section */}
       <section className="relative min-h-screen bg-cover bg-no-repeat" 
                style={{ backgroundImage: "url('/images/orange-backdrop 1.png')" }}>
@@ -54,27 +124,31 @@ export default function WishPage() {
         <motion.img 
           src="/images/design-5 1.png" 
           alt="Design"
-          className="absolute top-0 left-0 w-72 md:w-80"
+          className="absolute top-0 left-0 w-72 md:w-50"
           initial={{ opacity: 0, x: -100 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
         />
 
         {/* Main Message */}
-        <div className="flex flex-col justify-center items-start min-h-screen px-6 md:px-24 ">
+        <div className="flex flex-col justify-center items-start min-h-screen px-6 md:px-24">
           <motion.p 
-            className="text-3xl md:text-5xl lg:text-6xl font-normal max-w-4xl leading-relaxed text-gray-800"
+            className="text-3xl md:text-5xl font-normal max-w-4xl leading-relaxed text-gray-800"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.8 }}
           >
-            Hi {displayName},
+            Hi there,
             <br />
-            You mean the world to me...
+            Hope this brightens your day...
             <br />
             So this Diwali,
             <br />
-            I made something for you!
+            I wanted to share some joy with you!
+            <br />
+            <span className="text-2xl md:text-3xl lg:text-4xl mt-4 block text-right">
+              - From {displayName} with love ❤️
+            </span>
           </motion.p>
         </div>
 
@@ -170,10 +244,10 @@ export default function WishPage() {
             viewport={{ once: true }}
           >
             <p className="text-xl md:text-2xl lg:text-3xl leading-relaxed text-gray-800">
-              Dear {displayName}, Diwali is the festival of lights and today I want to share this beautiful moment with you!
+              People say, "Diwali is the festival of lights."
             </p>
             <p className="text-lg md:text-xl lg:text-2xl mt-4 leading-relaxed text-gray-700">
-              May this festival bring endless joy, prosperity, and happiness to your life. You deserve all the wonderful things this world has to offer!
+              You know what, I can feel the positivity and happiness. {displayName} wants to share this beautiful moment with you and wishes you endless joy, prosperity, and success in life!
             </p>
           </motion.div>
 
@@ -237,12 +311,9 @@ export default function WishPage() {
           viewport={{ once: true }}
         >
           <p className="text-2xl md:text-4xl text-gray-800 mb-4">
-            Happy Diwali {displayName}, and
+            Happy Diwali from {displayName}
           </p>
-          <h2 className="text-4xl md:text-6xl font-normal text-gray-800 inline"
-              style={{ fontFamily: 'Style Script, serif' }}>
-            Thank You For Everything..
-          </h2>
+        
         </motion.div>
 
         {/* Create Your Own Link Button */}
@@ -263,6 +334,63 @@ export default function WishPage() {
           </motion.a>
         </motion.div>
       </section>
+
+      {/* Author Section */}
+      <motion.section 
+        className="bg-gradient-to-b from-orange-400 to-orange-500 py-12 px-4"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        viewport={{ once: true }}
+      >
+        <motion.div 
+          className="max-w-4xl mx-auto text-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.3 }}
+          viewport={{ once: true }}
+        >
+          <div className="rounded-2xl p-8 ">
+      
+          
+            
+        
+            <motion.div 
+              className="mt-6 flex justify-center gap-4"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <motion.div
+                className="text-2xl"
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 0 }}
+              >
+                🪔
+              </motion.div>
+              <motion.div
+                className="text-2xl"
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+              >
+                💝
+              </motion.div>
+              <motion.div
+                className="text-2xl"
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
+              >
+                🌟
+              </motion.div>
+            </motion.div>
+
+            <p className=" text-white/70 mt-4">
+             <span> Developed by Ankit Jha with lots of </span>  ❤️
+            </p>
+          </div>
+        </motion.div>
+      </motion.section>
     </div>
   );
 }
